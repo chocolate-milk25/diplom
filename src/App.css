@@ -1,0 +1,109 @@
+/* Общие стили */
+.App {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #282c34;
+  color: white;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+/* Верхняя панель управления */
+.controls-container {
+  margin-bottom: 20px;
+}
+
+/* Кнопки управления (Play, Stop, Reset) */
+.controls button {
+  width: 100px;
+  height: 40px;
+  font-size: 16px;
+  background-color: #61dafb;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.controls button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+.controls button:hover:not(:disabled) {
+  background-color: #4a90e2;
+}
+
+/* Настройка BPM */
+.bpm-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+input[type="range"] {
+  width: 200px;
+}
+
+/* Основной контент (кнопки нот и сетка) */
+.content-container {
+  display: flex;
+  gap: 20px;
+}
+
+/* Контейнер для кнопок нот */
+.keys-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Кнопки для нот */
+.key-button {
+  width: 40px;
+  height: 40px;
+  background-color: #61dafb;
+  border: none;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  margin-bottom: 5px;
+  transition: background-color 0.2s ease;
+}
+.key-button:hover {
+  background-color: #4a90e2;
+}
+
+/* Звуковая дорожка */
+.sequencer-grid {
+  display: grid;
+  grid-template-columns: repeat(64, 20px);
+  gap: 1px;
+  border: 1px solid #333;
+  padding: 2px;
+  background-color: #333;
+}
+.cell {
+  width: 20px;
+  height: 20px;
+  background-color: #444;
+  border: 1px solid #555;
+  cursor: pointer;
+  position: relative;
+}
+.cell.active {
+  background-color: #8bc34a;
+}
+
+/* Маркер изменения длины */
+.resize-handle {
+  width: 10px;
+  height: 10px;
+  background-color: #ffcc00;
+  border-radius: 50%;
+  position: absolute;
+  right: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: ew-resize;
+}
+

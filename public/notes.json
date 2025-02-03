@@ -1,0 +1,14 @@
+[
+    {"name": "c4",  "file": "/sounds/piano/C4.mp3"},
+    {"name": "c#4",  "file": "/sounds/piano/Db4.mp3"},
+    {"name": "d4",  "file": "/sounds/piano/D4.mp3"},
+    {"name": "d#4",  "file": "/sounds/piano/Eb4.mp3"},
+    {"name": "e4",  "file": "/sounds/piano/E4.mp3"},
+    {"name": "f4",  "file": "/sounds/piano/F4.mp3"},
+    {"name": "f#4",  "file": "/sounds/piano/Gb4.mp3"},
+    {"name": "g4",  "file": "/sounds/piano/G4.mp3"},
+    {"name": "g#4",  "file": "/sounds/piano/Ab4.mp3"},
+    {"name": "a4",  "file": "/sounds/piano/A4.mp3"},
+    {"name": "a#4",  "file": "/sounds/piano/Bb4.mp3"},
+    {"name": "b4",  "file": "/sounds/piano/B4.mp3"}
+]
