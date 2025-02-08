@@ -1,0 +1,183 @@
+/* Общие стили */
+.App {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #282c34;
+  color: white;
+  padding: 20px;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* Верхняя панель управления */
+.controls-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Кнопки управления (Play, Stop, Reset, Export, Import) */
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.controls button,
+.controls label {
+  width: 100px;
+  height: 40px;
+  font-size: 16px;
+  background-color: #61dafb;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.controls button:disabled,
+.controls label:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+.controls button:hover:not(:disabled),
+.controls label:hover:not(:disabled) {
+  background-color: #4a90e2;
+}
+
+/* Настройка BPM */
+.bpm-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+input[type="range"] {
+  width: 200px;
+}
+
+/* Настройка количества шагов */
+.steps-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+input[type="number"] {
+  width: 50px;
+  padding: 5px;
+  text-align: center;
+}
+
+/* Обертка для всей области (клавиш + сетки) */
+.sequencer-wrapper {
+  position: relative;
+  width: 1200px; /* Ширина рамки */
+  height: 600px; /* Высота рамки */
+  border: 2px solid #555; /* Рамка */
+  overflow: hidden; /* Скрываем лишнее */
+  box-sizing: border-box;
+  margin: 0 auto; /* Центрируем рамку */
+}
+
+/* Общий контейнер для клавиш и сетки */
+.sequencer-content {
+  display: flex;
+  overflow-y: auto; /* Добавляем общую вертикальную прокрутку */
+  overflow-x: auto; /* Добавляем горизонтальную прокрутку */
+  max-height: 100%; /* Ограничиваем высоту контейнера */
+}
+
+/* Контейнер для пианино-клавиш */
+.piano-keys-container {
+  display: flex;
+  flex-direction: column; /* Вертикальное размещение */
+  align-items: center;
+  position: relative;
+  border: 1px solid #333; /* Рамка вокруг контейнера клавиш */
+  padding: 0; /* Убираем внутренние отступы */
+  background-color: #333; /* Фоновый цвет контейнера */
+  gap: 1px; /* Зазор между клавишами */
+  width: 120px; /* Ширина контейнера клавиш */
+}
+
+/* Все клавиши */
+.key-button {
+  width: 32px; /* Ширина клавиш */
+  height: 22px; /* Высота клавиш = высоте строки в сетке */
+  border: 1px solid #555; /* Рамочка вокруг клавиш */
+  cursor: pointer;
+  box-sizing: border-box; /* Включаем border в высоту */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 10px; /* Размер текста для клавиш */
+}
+
+/* Белые клавиши */
+.key-button.white-key {
+  background-color: white; /* Цвет белых клавиш */
+}
+
+/* Черные клавиши */
+.key-button.black-key {
+  background-color: black; /* Цвет черных клавиш */
+  color: white; /* Белый текст на черных клавишах */
+}
+
+/* Сетка секвенсера */
+.sequencer-grid {
+  display: flex;
+  flex-direction: column; /* Вертикальное размещение строк */
+  gap: 1px; /* Зазор между строками */
+  padding: 0; /* Убираем внутренние отступы */
+  background-color: #333; /* Фоновый цвет сетки */
+  min-width: 800px; /* Минимальная ширина сетки */
+  flex: 1; /* Занимает всё доступное пространство справа */
+}
+
+.note-row {
+  display: flex; /* Горизонтальное размещение ячеек */
+  gap: 1px; /* Зазор между ячейками */
+  height: 22px; /* Высота строки = высоте клавиш */
+  box-sizing: border-box; /* Включаем border в высоту */
+}
+
+.cell {
+  width: 20px;
+  height: 20px;
+  background-color: #444;
+  border: 1px solid #555; /* Рамочка вокруг ячейки */
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0; /* Запрещаем сжатие ячеек */
+  box-sizing: border-box; /* Включаем border в размер */
+}
+.cell.active {
+  background-color: #8bc34a; /* Цвет активных ячеек */
+}
+
+/* Вертикальная полоса воспроизведения */
+.playhead {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: calc(100% - 4px); /* Полная высота минус рамка */
+  background-color: #ff5722;
+  transform: translateX(120px); /* Начинаем после пианино-клавиш */
+  pointer-events: none; /* Чтобы не мешала взаимодействию с элементами */
+}
+
+/* Хэндлер изменения длины ноты */
+.resize-handle {
+  position: absolute;
+  top: 0;
+  right: -5px;
+  width: 10px;
+  height: 100%;
+  background-color: #f44336;
+  cursor: ew-resize;
+}
