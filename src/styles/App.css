@@ -73,13 +73,14 @@ input[type="number"] {
 
 /* Обертка для всей области (клавиш + сетки) */
 .sequencer-wrapper {
+  display: flex;
   position: relative;
-  width: 1200px; /* Ширина рамки */
-  height: 600px; /* Высота рамки */
-  border: 2px solid #555; /* Рамка */
-  overflow: hidden; /* Скрываем лишнее */
+  width: 1200px; 
+  height: 600px; 
+  border: 2px solid #555; 
+  overflow-x: auto; 
   box-sizing: border-box;
-  margin: 0 auto; /* Центрируем рамку */
+  margin: 0 auto; 
 }
 
 /* Общий контейнер для клавиш и сетки */
@@ -130,34 +131,29 @@ input[type="number"] {
 /* Сетка секвенсера */
 .sequencer-grid {
   display: flex;
-  flex-direction: column; /* Вертикальное размещение строк */
-  gap: 1px; /* Зазор между строками */
-  padding: 0; /* Убираем внутренние отступы */
-  background-color: #333; /* Фоновый цвет сетки */
-  min-width: 800px; /* Минимальная ширина сетки */
-  flex: 1; /* Занимает всё доступное пространство справа */
+  flex-direction: column;
+  gap: 5px;
+  background-color: #ddd; /* Фон для всего контейнера сетки */
 }
 
 .note-row {
-  display: flex; /* Горизонтальное размещение ячеек */
-  gap: 1px; /* Зазор между ячейками */
-  height: 22px; /* Высота строки = высоте клавиш */
-  box-sizing: border-box; /* Включаем border в высоту */
+  display: flex;
+  gap: 2px;
+  background-color: #ccc; /* Фон для ряда нот */
 }
 
 .cell {
   width: 20px;
   height: 20px;
-  background-color: #444;
-  border: 1px solid #555; /* Рамочка вокруг ячейки */
+  background-color: #e0e0e0;
+  border: 1px solid #ccc;
   cursor: pointer;
-  position: relative;
-  flex-shrink: 0; /* Запрещаем сжатие ячеек */
-  box-sizing: border-box; /* Включаем border в размер */
 }
+
 .cell.active {
-  background-color: #8bc34a; /* Цвет активных ячеек */
+  background-color: #007bff;
 }
+
 
 /* Вертикальная полоса воспроизведения */
 .playhead {
@@ -180,4 +176,13 @@ input[type="number"] {
   height: 100%;
   background-color: #f44336;
   cursor: ew-resize;
+}
+
+/* Стили для ячеек активных нот */
+.cell.active {
+  background-color: #8bc34a; /* Зеленый цвет для активных ячеек */
+}
+
+.cell:hover {
+  background-color: #555; /* Наведение на неактивную ячейку */
 }
