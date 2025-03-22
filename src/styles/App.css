@@ -105,8 +105,7 @@
   flex-direction: column;
   width: max-content;
   min-width: 100%;
-  overflow-x: auto;
-  overflow-y: auto;
+  overflow: auto;
   scroll-behavior: smooth;
   position: relative;
 }

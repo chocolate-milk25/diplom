@@ -14,6 +14,8 @@ function App() {
   const [bpm, setBpm] = useState(120);
   const [notes, setNotes] = useState([]);
   const [totalSteps, setTotalSteps] = useState(64);
+  console.log(totalSteps + "steps")
+  console.log(bpm + "bpm")
 
   const pianoRef = useRef(null); // Ссылка на контейнер с клавишами
   const sequencerRef = useRef(null); // Ссылка на контейнер с сеткой
@@ -111,7 +113,7 @@ function App() {
         <NumberControl label="BPM" value={bpm} onChange={setBpm} min={60} max={240} />
         <NumberControl label="Steps" value={totalSteps} onChange={setTotalSteps} min={1} max={256} />
       </div>
-      <input id="import-file" type="file" style={{ display: "none" }} onChange={handleImport(setSoundTrack, setBpm, setTotalSteps)} />
+      <input id="import-file" type="file" style={{ display: "none" }} onChange={handleImport(setTotalSteps, setBpm, setSoundTrack)} />
     </div>
   );
 }

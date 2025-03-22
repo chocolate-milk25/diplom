@@ -1,5 +1,5 @@
 export const handleExport = (soundTrack, bpm, totalSteps) => {
-    const data = {  bpm, totalSteps, soundTrack }
+    const data = { bpm, totalSteps, soundTrack }
     const dataStr = JSON.stringify(data, null, 2);
     const blob = new Blob([dataStr], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -14,16 +14,19 @@ export const handleExport = (soundTrack, bpm, totalSteps) => {
 export const handleImport = (setTotalSteps, setBpm, setSoundTrack) => (event) => {
     const file = event.target.files[0];
     if (!file) return;
-    
+
     const reader = new FileReader();
     reader.onload = (e) => {
         try {
             const content = JSON.parse(e.target.result);
-            
+            console.log(content);
+
             if (content.soundTrack && Array.isArray(content.soundTrack)) {
                 setSoundTrack(content.soundTrack);
                 if (content.bpm) setBpm(content.bpm);
-                if (content.totalSteps) setTotalSteps(content.totalSteps);
+                if (content.totalSteps) {
+                    setTotalSteps(+content.totalSteps);
+                }
             } else {
                 alert("Invalid file format.");
             }
@@ -32,7 +35,7 @@ export const handleImport = (setTotalSteps, setBpm, setSoundTrack) => (event) =>
             alert("Error reading the file.");
         }
     };
-    
+
     reader.readAsText(file);
 };
 
