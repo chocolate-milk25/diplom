@@ -4,7 +4,8 @@ import Controls from "./components/Controls";
 import PianoKeys from "./components/PianoKeys";
 import SequencerGrid from "./components/SequencerGrid";
 import NumberControl from "./components/NumberControl";
-import { playSound, handleReset, fetchNotes } from './utils/soundUtils';
+import Equalizer from "./components/Equalizer";
+import { handleReset, fetchNotes } from './utils/soundUtils';
 import { handleExport, handleImport } from './utils/fileUtils';
 
 function App() {
@@ -14,11 +15,39 @@ function App() {
   const [bpm, setBpm] = useState(120);
   const [notes, setNotes] = useState([]);
   const [totalSteps, setTotalSteps] = useState(64);
-  console.log(totalSteps + "steps")
-  console.log(bpm + "bpm")
 
-  const pianoRef = useRef(null); // Ссылка на контейнер с клавишами
-  const sequencerRef = useRef(null); // Ссылка на контейнер с сеткой
+  const pianoRef = useRef(null);
+  const sequencerRef = useRef(null);
+
+  const audioContextRef = useRef(null);
+  const analyserRef = useRef(null);
+  const filtersRef = useRef({ low: null, mid: null, high: null });
+
+  useEffect(() => {
+    const context = new AudioContext();
+    audioContextRef.current = context;
+
+    const low = context.createBiquadFilter();
+    low.type = "lowshelf";
+    low.frequency.value = 320;
+
+    const mid = context.createBiquadFilter();
+    mid.type = "peaking";
+    mid.frequency.value = 1000;
+    mid.Q.value = 1;
+
+    const high = context.createBiquadFilter();
+    high.type = "highshelf";
+    high.frequency.value = 3200;
+
+    filtersRef.current = { low, mid, high };
+
+    const analyser = context.createAnalyser();
+    analyser.fftSize = 256;
+    high.connect(analyser);
+    analyser.connect(context.destination);
+    analyserRef.current = analyser;
+  }, []);
 
   const toggleNote = (step, noteName) => {
     setSoundTrack((prevTrack) => {
@@ -26,19 +55,29 @@ function App() {
       const existingNoteIndex = updatedTrack.findIndex(
         (n) => n.name === noteName && n.start <= step && step < n.start + n.length
       );
-
       if (existingNoteIndex === -1) {
-        updatedTrack.push({
-          name: noteName,
-          start: step,
-          length: 1,
-        });
+        updatedTrack.push({ name: noteName, start: step, length: 1 });
       } else {
         updatedTrack.splice(existingNoteIndex, 1);
       }
-
       return updatedTrack;
     });
+  };
+
+  const playNoteWithAnalyser = async (filePath) => {
+    if (!audioContextRef.current || !analyserRef.current) return;
+    const response = await fetch(filePath);
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = await audioContextRef.current.decodeAudioData(arrayBuffer);
+    const source = audioContextRef.current.createBufferSource();
+    source.buffer = buffer;
+
+    const { low, mid, high } = filtersRef.current;
+    source.connect(low);
+    low.connect(mid);
+    mid.connect(high);
+
+    source.start(0);
   };
 
   const playStepNotes = (step) => {
@@ -47,7 +86,7 @@ function App() {
     );
     activeNotes.forEach((note) => {
       const noteData = notes.find((n) => n.name === note.name);
-      if (noteData) playSound(noteData.file);
+      if (noteData) playNoteWithAnalyser(noteData.file);
     });
   };
 
@@ -68,11 +107,9 @@ function App() {
     } else {
       clearInterval(intervalId);
     }
-
     return () => clearInterval(intervalId);
   }, [isPlaying, bpm, totalSteps]);
 
-  // Синхронизация прокрутки
   const syncScroll = () => {
     const pianoScroll = pianoRef.current.scrollTop;
     const sequencerScroll = sequencerRef.current.scrollTop;
@@ -95,7 +132,7 @@ function App() {
       <div className="sequencer-wrapper" onScroll={syncScroll}>
         <div className="sequencer-content">
           <div ref={pianoRef} className="piano-keys-container">
-            <PianoKeys notes={notes} playSound={playSound} />
+            <PianoKeys notes={notes} playSound={playNoteWithAnalyser} />
           </div>
           <div ref={sequencerRef} className="sequencer-grid">
             <SequencerGrid
@@ -114,6 +151,10 @@ function App() {
         <NumberControl label="Steps" value={totalSteps} onChange={setTotalSteps} min={1} max={256} />
       </div>
       <input id="import-file" type="file" style={{ display: "none" }} onChange={handleImport(setTotalSteps, setBpm, setSoundTrack)} />
+      <Equalizer
+        analyser={analyserRef.current}
+        filters={[filtersRef.current.low, filtersRef.current.mid, filtersRef.current.high]}
+      />
     </div>
   );
 }
