@@ -5,6 +5,8 @@ import PianoKeys from "./components/PianoKeys";
 import SequencerGrid from "./components/SequencerGrid";
 import NumberControl from "./components/NumberControl";
 import Equalizer from "./components/Equalizer";
+import Compressor from "./components/Compressor.jsx";
+import Visualizer from "./components/Visualizer";
 import { handleReset, fetchNotes } from './utils/soundUtils';
 import { handleExport, handleImport } from './utils/fileUtils';
 
@@ -16,6 +18,9 @@ function App() {
   const [notes, setNotes] = useState([]);
   const [totalSteps, setTotalSteps] = useState(64);
 
+  const compressorRef = useRef(null);
+  const [compressorReady, setCompressorReady] = useState(false);
+
   const pianoRef = useRef(null);
   const sequencerRef = useRef(null);
 
@@ -24,68 +29,83 @@ function App() {
   const filtersRef = useRef({ low: null, mid: null, high: null });
 
   useEffect(() => {
-    const context = new AudioContext();
-    audioContextRef.current = context;
+    if (!audioContextRef.current) {
+      const context = new AudioContext();
+      audioContextRef.current = context;
 
-    const low = context.createBiquadFilter();
-    low.type = "lowshelf";
-    low.frequency.value = 320;
+      const low = context.createBiquadFilter();
+      low.type = "lowshelf";
+      low.frequency.value = 320;
 
-    const mid = context.createBiquadFilter();
-    mid.type = "peaking";
-    mid.frequency.value = 1000;
-    mid.Q.value = 1;
+      const mid = context.createBiquadFilter();
+      mid.type = "peaking";
+      mid.frequency.value = 1000;
+      mid.Q.value = 1;
 
-    const high = context.createBiquadFilter();
-    high.type = "highshelf";
-    high.frequency.value = 3200;
+      const high = context.createBiquadFilter();
+      high.type = "highshelf";
+      high.frequency.value = 3200;
 
-    filtersRef.current = { low, mid, high };
+      const compressor = context.createDynamicsCompressor();
 
-    const analyser = context.createAnalyser();
-    analyser.fftSize = 256;
-    high.connect(analyser);
-    analyser.connect(context.destination);
-    analyserRef.current = analyser;
+      // Подключаем фильтры друг к другу
+      low.connect(mid);
+      mid.connect(high);
+      high.connect(compressor);
+
+      const masterAnalyser = context.createAnalyser();
+      masterAnalyser.fftSize = 256;
+
+      compressor.connect(masterAnalyser);
+      masterAnalyser.connect(context.destination);
+
+      filtersRef.current = { low, mid, high };
+      compressorRef.current = compressor;
+      analyserRef.current = masterAnalyser;
+
+      setCompressorReady(true);
+    }
   }, []);
 
   const toggleNote = (step, noteName) => {
-    setSoundTrack((prevTrack) => {
-      const updatedTrack = [...prevTrack];
-      const existingNoteIndex = updatedTrack.findIndex(
-        (n) => n.name === noteName && n.start <= step && step < n.start + n.length
+    setSoundTrack(prevTrack => {
+      const updated = [...prevTrack];
+      const index = updated.findIndex(
+        (n) => n.name === noteName && step >= n.start && step < n.start + n.length
       );
-      if (existingNoteIndex === -1) {
-        updatedTrack.push({ name: noteName, start: step, length: 1 });
+      if (index === -1) {
+        updated.push({ name: noteName, start: step, length: 1 });
       } else {
-        updatedTrack.splice(existingNoteIndex, 1);
+        updated.splice(index, 1);
       }
-      return updatedTrack;
+      return updated;
     });
   };
 
   const playNoteWithAnalyser = async (filePath) => {
-    if (!audioContextRef.current || !analyserRef.current) return;
-    const response = await fetch(filePath);
-    const arrayBuffer = await response.arrayBuffer();
-    const buffer = await audioContextRef.current.decodeAudioData(arrayBuffer);
-    const source = audioContextRef.current.createBufferSource();
-    source.buffer = buffer;
+  if (!audioContextRef.current || !analyserRef.current) return;
 
-    const { low, mid, high } = filtersRef.current;
-    source.connect(low);
-    low.connect(mid);
-    mid.connect(high);
+  const context = audioContextRef.current;
+  const response = await fetch(filePath);
+  const arrayBuffer = await response.arrayBuffer();
 
-    source.start(0);
-  };
+  // decodeAudioData в AudioContext с промисом (новый стандарт)
+  const buffer = await context.decodeAudioData(arrayBuffer);
+
+  const source = context.createBufferSource();
+  source.buffer = buffer;
+
+  const { low } = filtersRef.current;
+  source.connect(low);
+  source.start(0);
+};
 
   const playStepNotes = (step) => {
     const activeNotes = soundTrack.filter(
-      (note) => note.start <= step && step < note.start + note.length
+      (n) => step >= n.start && step < n.start + n.length
     );
-    activeNotes.forEach((note) => {
-      const noteData = notes.find((n) => n.name === note.name);
+    activeNotes.forEach(({ name }) => {
+      const noteData = notes.find(n => n.name === name);
       if (noteData) playNoteWithAnalyser(noteData.file);
     });
   };
@@ -95,31 +115,26 @@ function App() {
   }, []);
 
   useEffect(() => {
-    let intervalId;
-    if (isPlaying) {
-      const interval = (60 / bpm) * 1000;
-      intervalId = setInterval(() => {
-        setCurrentStep((prevStep) => {
-          playStepNotes(prevStep);
-          return (prevStep + 1) % totalSteps;
-        });
-      }, interval);
-    } else {
-      clearInterval(intervalId);
-    }
-    return () => clearInterval(intervalId);
+    if (!isPlaying) return;
+    const interval = (60 / bpm) * 1000;
+    const id = setInterval(() => {
+      setCurrentStep(step => {
+        playStepNotes(step);
+        return (step + 1) % totalSteps;
+      });
+    }, interval);
+    return () => clearInterval(id);
   }, [isPlaying, bpm, totalSteps]);
 
   const syncScroll = () => {
-    const pianoScroll = pianoRef.current.scrollTop;
-    const sequencerScroll = sequencerRef.current.scrollTop;
-    if (pianoScroll !== sequencerScroll) {
-      sequencerRef.current.scrollTop = pianoScroll;
+    if (pianoRef.current && sequencerRef.current) {
+      sequencerRef.current.scrollTop = pianoRef.current.scrollTop;
     }
   };
 
   return (
     <div className="App">
+      <Visualizer analyser={analyserRef.current} />
       <Controls
         buttons={[
           { label: "Play", action: () => setIsPlaying(true), disabled: isPlaying },
@@ -155,6 +170,7 @@ function App() {
         analyser={analyserRef.current}
         filters={[filtersRef.current.low, filtersRef.current.mid, filtersRef.current.high]}
       />
+      {compressorReady && <Compressor compressor={compressorRef.current} />}
     </div>
   );
 }
