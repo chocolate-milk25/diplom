@@ -1,97 +1,41 @@
-.track {
-  background-color: #333;
-  border-radius: 6px;
-  padding: 15px;
-  margin-bottom: 15px;
-  border-left: 4px solid #4CAF50;
-}
+/* Добавьте эти стили в Track.module.css */
 
-.track.selected {
-  border-left-color: #ff9800;
-  background-color: #3a3a3a;
-}
-
-.trackHeader {
+.controlButton {
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
   align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
 }
 
-.trackName {
-  margin: 0;
-  font-size: 1rem;
-  color: #e0e0e0;
+.playButton {
+  background: #4CAF50;
+  color: white;
+}
+
+.playButton:hover {
+  background: #3e8e41;
+}
+
+.stopButton {
+  background: #f44336;
+  color: white;
+}
+
+.stopButton:hover {
+  background: #d32f2f;
 }
 
 .removeButton {
   background: #f44336;
-  border: none;
   color: white;
-  width: 30px;
-  height: 30px;
-  border-radius: 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  margin-left: 10px;
 }
 
-.trackControls {
-  display: flex;
-  gap: 15px;
-  margin-top: 15px;
-}
-
-.controlGroup {
-  flex: 1;
-}
-
-.controlGroup label {
-  display: block;
-  margin-bottom: 5px;
-  font-size: 0.8rem;
-  color: #aaa;
-}
-
-.toggleButtons {
-  display: flex;
-  gap: 8px;
-}
-
-.muteButton, .soloButton {
-  width: 40px;
-  height: 40px;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #444;
-  color: white;
-}
-
-.muteButton.active {
-  background: #f44336;
-}
-
-.soloButton.active {
-  background: #ffc107;
-  color: #000;
-}
-
-.effectsChain {
-  margin-top: 15px;
-}
-
-.addEffectButton {
-  width: 100%;
-  padding: 8px;
-  background: #2196F3;
-  border: none;
-  color: white;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 10px;
+.removeButton:hover {
+  background: #d32f2f;
 }

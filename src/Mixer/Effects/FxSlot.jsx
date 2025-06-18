@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
-import EQ from './EQ.jsx';
-import Compressor from './Compressor';
-import { Reverb } from './Reverb';
-import { FiSettings, FiX } from 'react-icons/fi';
+import { FiSettings, FiX, FiPower } from 'react-icons/fi';
 import styles from './FxSlot.module.css';
 
 const effectComponents = {
-  eq: EQ,
-  compressor: Compressor,
-  reverb: Reverb
+  eq: React.lazy(() => import('./EQ')),
+  compressor: React.lazy(() => import('./Compressor')),
+  reverb: React.lazy(() => import('./Reverb'))
 };
 
 export default function FxSlot({ effect, onUpdate, onRemove }) {
@@ -19,17 +16,32 @@ export default function FxSlot({ effect, onUpdate, onRemove }) {
     onUpdate({ ...effect, params });
   };
 
+  const toggleActive = () => {
+    onUpdate({ ...effect, active: !effect.active });
+  };
+
   return (
     <div className={`${styles.fxSlot} ${isExpanded ? styles.expanded : ''}`}>
-      <div 
-        className={styles.fxHeader}
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        <span className={styles.fxName}>
-          {effect.type === 'eq' && 'Эквалайзер'}
-          {effect.type === 'compressor' && 'Компрессор'}
-          {effect.type === 'reverb' && 'Реверберация'}
-        </span>
+      <div className={styles.fxHeader}>
+        <div 
+          className={styles.fxTitle}
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <button 
+            className={`${styles.activeToggle} ${effect.active ? styles.active : ''}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleActive();
+            }}
+          >
+            <FiPower />
+          </button>
+          <span className={styles.fxName}>
+            {effect.type === 'eq' && 'Эквалайзер'}
+            {effect.type === 'compressor' && 'Компрессор'}
+            {effect.type === 'reverb' && 'Реверберация'}
+          </span>
+        </div>
         <div className={styles.fxActions}>
           <button 
             className={styles.fxSettingsButton}
@@ -53,12 +65,14 @@ export default function FxSlot({ effect, onUpdate, onRemove }) {
       </div>
 
       {isExpanded && EffectComponent && (
-        <div className={styles.fxContent}>
-          <EffectComponent 
-            params={effect.params} 
-            onUpdate={handleParamChange}
-          />
-        </div>
+        <React.Suspense fallback={<div>Загрузка...</div>}>
+          <div className={styles.fxContent}>
+            <EffectComponent 
+              params={effect.params || {}} 
+              onUpdate={handleParamChange}
+            />
+          </div>
+        </React.Suspense>
       )}
     </div>
   );

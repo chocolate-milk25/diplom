@@ -4,4 +4,17 @@
   background: #222;
   border-radius: 4px;
   margin-bottom: 10px;
+  overflow: hidden;
+}
+
+/* Стили для регионов */
+wave {
+  cursor: pointer;
+}
+
+/* Стили для временной шкалы */
+wavesurfer-timeline {
+  background-color: #333;
+  height: 20px;
+  color: #fff;
 }

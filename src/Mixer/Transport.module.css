@@ -1,0 +1,67 @@
+.transportContainer {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: #2a2a2a;
+  padding: 10px 15px;
+  border-radius: 6px;
+}
+
+.transportControls {
+  display: flex;
+  gap: 10px;
+}
+
+.transportButton {
+  background: #444;
+  border: none;
+  color: #fff;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.transportButton:hover {
+  background: #555;
+}
+
+.transportButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.transportButton.active {
+  background: #4CAF50;
+  color: #fff;
+}
+
+.bpmControl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bpmControl label {
+  font-size: 14px;
+  color: #aaa;
+}
+
+.bpmInput {
+  background: #333;
+  border: 1px solid #444;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 4px;
+  width: 60px;
+  text-align: center;
+}
+
+.bpmInput:focus {
+  outline: none;
+  border-color: #4CAF50;
+}

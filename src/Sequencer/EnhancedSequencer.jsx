@@ -6,13 +6,11 @@ import './Sequencer.css';
 
 const NOTES = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 const OCTAVES = [2, 3, 4, 5, 6];
-const STEP_WIDTH = 35; // Увеличил ширину шага
+const STEP_WIDTH = 35;
 
 export default function EnhancedSequencer({ synthPlayNote, synthSettings, settings }) {
   const [steps, setSteps] = useState(16);
-  const [pattern, setPattern] = useState(() => 
-    NOTES.map(() => new Array(32).fill(0)) // Изначально создаём массив на 32 шага
-  );
+  const [pattern, setPattern] = useState(() => NOTES.map(() => new Array(32).fill(0)));
   const [playing, setPlaying] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [bpm, setBpm] = useState(120);
@@ -20,85 +18,79 @@ export default function EnhancedSequencer({ synthPlayNote, synthSettings, settin
   const [dragInfo, setDragInfo] = useState(null);
   const [activeNotes, setActiveNotes] = useState([]);
   const transportRef = useRef(null);
+  const recorder = useRef(null);
 
-  // Инициализация Tone.js
   useEffect(() => {
     transportRef.current = Tone.Transport;
-    return () => {
-      transportRef.current.cancel();
-    };
+    recorder.current = new Tone.Recorder();
+    Tone.getDestination().connect(recorder.current);
+    return () => transportRef.current.cancel();
   }, []);
 
-  // Playback logic
   useEffect(() => {
     if (!playing) {
       setCurrentStep(0);
       transportRef.current.cancel();
       return;
     }
-    
+
     transportRef.current.bpm.value = bpm;
     transportRef.current.cancel();
-    
-    // Schedule all notes with synth settings
+
     pattern.forEach((row, noteIdx) => {
       row.forEach((duration, stepIdx) => {
         if (stepIdx >= steps) return;
         if (duration > 0) {
           const time = stepIdx * 0.25;
           const note = `${NOTES[noteIdx]}${octave}`;
-          
-          transportRef.current.schedule(time => {
-            // Создаем временный синтезатор с текущими настройками
-            if (!synthSettings) {
-              synthPlayNote(Tone.Midi(note).toFrequency());
-              return;
-            }
-
-            const tempSynth = new Tone.PolySynth(Tone.Synth).toDestination();
-            
-            // Применяем настройки
-            tempSynth.get().oscillator.type = synthSettings.osc1.type;
-            tempSynth.get().envelope.attack = synthSettings.envelope.attack;
-            tempSynth.get().envelope.decay = synthSettings.envelope.decay;
-            tempSynth.get().envelope.sustain = synthSettings.envelope.sustain;
-            tempSynth.get().envelope.release = synthSettings.envelope.release;
-            
-            // Применяем фильтр
-            const tempFilter = new Tone.Filter({
-              frequency: synthSettings.filter.frequency,
-              type: synthSettings.filter.type,
-              Q: synthSettings.filter.Q
-            }).toDestination();
-            
-            tempSynth.connect(tempFilter);
-            
-            // Воспроизводим ноту
-            tempSynth.triggerAttackRelease(note, "8n", time);
-            
-            // Очистка после воспроизведения
-            setTimeout(() => {
-              tempSynth.dispose();
-              tempFilter.dispose();
-            }, 1000);
+          transportRef.current.schedule((time) => {
+            synthPlayNote(Tone.Midi(note).toFrequency());
           }, time);
         }
       });
     });
-    
+
     let step = 0;
-    const loop = new Tone.Loop(time => {
+    const loop = new Tone.Loop((time) => {
       setCurrentStep(step);
       step = (step + 1) % steps;
-    }, "16n").start(0);
-    
+    }, '16n').start(0);
+
     transportRef.current.start();
-    
+
     return () => {
       loop.dispose();
       transportRef.current.stop();
     };
-  }, [playing, bpm, steps, pattern, octave, synthSettings]);
+  }, [playing, bpm, steps, pattern, octave]);
+
+  const exportPattern = () => {
+    const data = {
+      pattern: pattern.map(row => row.slice(0, steps)),
+      bpm,
+      steps,
+      octave,
+      synthSettings
+    };
+    const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+    saveAs(blob, 'pattern.json');
+  };
+
+  const exportWav = async () => {
+    const duration = (steps * 0.25) * (60 / bpm);
+    await recorder.current.start();
+    setPlaying(true);
+    setTimeout(async () => {
+      const recording = await recorder.current.stop();
+      const url = URL.createObjectURL(recording);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'sequence.wav';
+      a.click();
+      setPlaying(false);
+    }, duration * 1000);
+  };
+
 
   // Handle note toggle
   const toggleNote = (noteIdx, stepIdx, isRightClick = false) => {
@@ -194,17 +186,7 @@ export default function EnhancedSequencer({ synthPlayNote, synthSettings, settin
   };
 
   // Export pattern to JSON
-  const exportPattern = () => {
-    const data = {
-      pattern: pattern.map(row => row.slice(0, steps)), // Экспортируем только активные шаги
-      bpm,
-      steps,
-      octave,
-      synthSettings
-    };
-    const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
-    saveAs(blob, 'pattern.json');
-  };
+ 
 
   // Import pattern from JSON
   const importPattern = (e) => {
@@ -327,44 +309,29 @@ export default function EnhancedSequencer({ synthPlayNote, synthSettings, settin
   return (
     <div className="vst-sequencer">
       <div className="sequencer-controls">
-        <button onClick={() => setPlaying(!playing)}>
-          {playing ? 'Stop' : 'Play'}
-        </button>
-        <input 
-          type="range" 
-          min="30" 
-          max="300" 
-          value={bpm} 
-          onChange={(e) => setBpm(Number(e.target.value))}
-        />
+        <button onClick={() => setPlaying(!playing)}>{playing ? 'Stop' : 'Play'}</button>
+        <input type="range" min="30" max="300" value={bpm} onChange={(e) => setBpm(Number(e.target.value))} />
         <span>BPM: {bpm}</span>
-        
+
         <div className="octave-control">
-          <button onClick={() => setOctave(Math.max(Math.min(...OCTAVES), octave - 1))}>
-            -
-          </button>
+          <button onClick={() => setOctave(Math.max(Math.min(...OCTAVES), octave - 1))}>-</button>
           <span>Octave: {octave}</span>
-          <button onClick={() => setOctave(Math.min(Math.max(...OCTAVES), octave + 1))}>
-            +
-          </button>
+          <button onClick={() => setOctave(Math.min(Math.max(...OCTAVES), octave + 1))}>+</button>
         </div>
-        
+
         <div className="steps-control">
           <button onClick={() => setSteps(Math.max(4, steps - 1))}>-</button>
           <span>Steps: {steps}</span>
           <button onClick={() => setSteps(Math.min(32, steps + 1))}>+</button>
         </div>
-        
+
         <button onClick={exportPattern}>Export Pattern</button>
+        <button onClick={exportWav}>Export WAV</button>
         <input type="file" accept=".json" onChange={importPattern} />
       </div>
-      
       {renderKeyboard()}
-      
       <div className="piano-roll">
-        <div className="steps-grid">
-          {renderGrid()}
-        </div>
+        <div className="steps-grid">{renderGrid()}</div>
       </div>
     </div>
   );

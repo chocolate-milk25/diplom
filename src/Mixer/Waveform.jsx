@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import WaveSurfer from 'wavesurfer.js';
+import RegionsPlugin from 'wavesurfer.js/src/plugin/regions';
 import styles from './Waveform.module.css';
 
 export default function Waveform({ buffer, onRegionCreated }) {
@@ -9,6 +10,7 @@ export default function Waveform({ buffer, onRegionCreated }) {
   useEffect(() => {
     if (!buffer || !waveformRef.current) return;
 
+    // Инициализация Wavesurfer с плагином
     wavesurferRef.current = WaveSurfer.create({
       container: waveformRef.current,
       waveColor: '#4CAF50',
@@ -22,18 +24,19 @@ export default function Waveform({ buffer, onRegionCreated }) {
       responsive: true,
       normalize: true,
       plugins: [
-        WaveSurfer.regions.create({
+        RegionsPlugin.create({
           dragSelection: {
-            slop: 5
+            slop: 5,
+            color: 'rgba(255, 87, 34, 0.3)'
           }
         })
       ]
     });
 
-    if (buffer) {
-      wavesurferRef.current.loadDecodedBuffer(buffer.get());
-    }
+    // Загрузка аудиобуфера
+    wavesurferRef.current.loadDecodedBuffer(buffer.get());
 
+    // Обработчик создания региона
     wavesurferRef.current.on('region-created', (region) => {
       if (onRegionCreated) {
         onRegionCreated({

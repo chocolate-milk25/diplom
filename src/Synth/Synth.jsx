@@ -243,8 +243,6 @@ export default function Synth({ refPlayNote, refStopNote, settings, audioStarted
     </div>
   );
 
-  
-
   useEffect(() => {
     if (refPlayNote) refPlayNote.current = playNote;
     if (refStopNote) refStopNote.current = (release) => release?.();

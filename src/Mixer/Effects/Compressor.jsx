@@ -1,7 +1,6 @@
 import React from 'react';
 import styles from './Effects.module.css';
 
-
 const Knob = ({ label, value, min, max, step = 0.01, onChange }) => (
   <div className="vst-knob">
     <div className="knob-label">{label}</div>
@@ -17,11 +16,13 @@ const Knob = ({ label, value, min, max, step = 0.01, onChange }) => (
     <div className="knob-value">{value.toFixed(2)}</div>
   </div>
 );
-export default function Reverb({ params = {}, onUpdate }) {
+
+export default function Compressor({ params = {}, onUpdate }) {
   const defaultParams = {
-    decay: 2.5,
-    preDelay: 0.01,
-    wet: 0.5,
+    threshold: -24,
+    ratio: 4,
+    attack: 0.003,
+    release: 0.25,
     ...params
   };
 
@@ -31,31 +32,39 @@ export default function Reverb({ params = {}, onUpdate }) {
 
   return (
     <div className={styles.effectContainer}>
-      <h4 className={styles.effectTitle}>Реверберация</h4>
+      <h4 className={styles.effectTitle}>Компрессор</h4>
       <div className={styles.effectParams}>
         <Knob
-          label="Декей"
-          value={defaultParams.decay}
-          min={0.1}
-          max={10}
+          label="Порог"
+          value={defaultParams.threshold}
+          min={-60}
+          max={0}
+          step={1}
+          onChange={(val) => handleChange('threshold', val)}
+        />
+        <Knob
+          label="Соотношение"
+          value={defaultParams.ratio}
+          min={1}
+          max={20}
           step={0.1}
-          onChange={(val) => handleChange('decay', val)}
+          onChange={(val) => handleChange('ratio', val)}
         />
         <Knob
-          label="Предзадержка"
-          value={defaultParams.preDelay}
-          min={0.01}
-          max={0.5}
-          step={0.01}
-          onChange={(val) => handleChange('preDelay', val)}
-        />
-        <Knob
-          label="Эффект"
-          value={defaultParams.wet}
-          min={0}
+          label="Атака"
+          value={defaultParams.attack}
+          min={0.001}
           max={1}
+          step={0.001}
+          onChange={(val) => handleChange('attack', val)}
+        />
+        <Knob
+          label="Релиз"
+          value={defaultParams.release}
+          min={0.01}
+          max={2}
           step={0.01}
-          onChange={(val) => handleChange('wet', val)}
+          onChange={(val) => handleChange('release', val)}
         />
       </div>
     </div>
