@@ -1,0 +1,120 @@
+/* Mixer.module.css */
+.mixerContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #252525;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.toolbar {
+  display: flex;
+  gap: 15px;
+  padding: 15px;
+  background: #2a2a2a;
+  border-bottom: 1px solid #3a3a3a;
+  flex-wrap: wrap;
+}
+
+.toolbarButton {
+  background: linear-gradient(to bottom, #4a4a4a, #3a3a3a);
+  border: 1px solid #555;
+  color: #ddd;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.toolbarButton:hover {
+  background: linear-gradient(to bottom, #5a5a5a, #4a4a3a);
+  border-color: #666;
+  color: #fff;
+}
+
+.toolbarButton:active {
+  background: linear-gradient(to bottom, #3a3a3a, #2a2a2a);
+}
+
+.tracksContainer {
+  flex: 1;
+  overflow-y: auto;
+  padding: 15px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 15px;
+  align-content: flex-start;
+}
+
+/* Стили для пустого состояния */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #777;
+  grid-column: 1 / -1;
+}
+
+.emptyState p {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+/* Адаптивные стили */
+@media (max-width: 768px) {
+  .tracksContainer {
+    grid-template-columns: 1fr;
+  }
+  
+  .toolbar {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .toolbarButton {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Анимация добавления трека */
+@keyframes trackAppear {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tracksContainer > * {
+  animation: trackAppear 0.3s ease-out;
+}
+
+/* Стили для скроллбара */
+.tracksContainer::-webkit-scrollbar {
+  width: 8px;
+}
+
+.tracksContainer::-webkit-scrollbar-track {
+  background: #2a2a2a;
+}
+
+.tracksContainer::-webkit-scrollbar-thumb {
+  background: #4a4a4a;
+  border-radius: 4px;
+}
+
+.tracksContainer::-webkit-scrollbar-thumb:hover {
+  background: #5a5a5a;
+}

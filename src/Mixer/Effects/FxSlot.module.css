@@ -1,0 +1,51 @@
+.fxSlot {
+  background: #3a3a3a;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.fxHeader {
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  background: #444;
+}
+
+.fxName {
+  font-weight: bold;
+  color: #e0e0e0;
+}
+
+.fxActions {
+  display: flex;
+  gap: 5px;
+}
+
+.fxSettingsButton, .fxRemoveButton {
+  background: none;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.fxSettingsButton:hover, .fxRemoveButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.fxRemoveButton {
+  color: #f44336;
+}
+
+.fxContent {
+  padding: 10px;
+  background: #333;
+}

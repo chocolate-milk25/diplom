@@ -1,0 +1,459 @@
+/* App.css */
+
+/* Базовые сбросы и настройки */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+  line-height: 1.6;
+  padding: 20px;
+}
+
+/* Общие стили для VST-интерфейсов */
+.vst-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #2a2a2a;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+}
+
+.vst-header {
+  background: linear-gradient(to bottom, #3a3a3a, #2a2a2a);
+  padding: 15px 20px;
+  display: flex;
+  gap: 15px;
+  border-bottom: 1px solid #444;
+}
+
+.vst-header button {
+  background: linear-gradient(to bottom, #4a4a4a, #3a3a3a);
+  border: 1px solid #555;
+  color: #ddd;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.vst-header button:hover {
+  background: linear-gradient(to bottom, #5a5a5a, #4a4a4a);
+  border-color: #666;
+  color: #fff;
+}
+
+.vst-header button:active {
+  background: linear-gradient(to bottom, #3a3a3a, #2a2a2a);
+}
+
+/* Стили для основного контента */
+.main-content {
+  padding: 20px;
+  min-height: 500px;
+  background-color: #252525;
+}
+
+/* Стили для переключателей и кнопок */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #444;
+  transition: .4s;
+  border-radius: 24px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+  background-color: #4CAF50;
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(26px);
+}
+
+/* Стили для ползунков */
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  background: #444;
+  outline: none;
+  border-radius: 3px;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+/* Стили для индикаторов */
+.led-indicator {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #444;
+  margin-right: 5px;
+}
+
+.led-indicator.active {
+  background-color: #ff5722;
+}
+
+/* Анимации */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.blinking {
+  animation: blink 1s linear infinite;
+}
+
+/* Медиа-запросы для адаптивности */
+@media (max-width: 768px) {
+  .vst-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .vst-header button {
+    width: 100%;
+  }
+}
+
+/* Специфичные стили для компонентов */
+.synth-container, .sequencer-container, .mixer-container {
+  background-color: #2d2d2d;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+  border: 1px solid #3a3a3a;
+}
+
+/* Стили для формы элементов */
+select, input[type="text"], input[type="number"] {
+  background-color: #333;
+  border: 1px solid #444;
+  color: #eee;
+  padding: 8px 12px;
+  border-radius: 4px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+select:focus, input:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+/* Стили для таблиц (секвенсор) */
+.step-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.step-table th, .step-table td {
+  border: 1px solid #444;
+  padding: 8px;
+  text-align: center;
+}
+
+.step-table th {
+  background-color: #3a3a3a;
+}
+
+/* Стили для дорожек микшера */
+.track {
+  background-color: #333;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-left: 4px solid #4CAF50;
+}
+
+.track-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.track-controls {
+  display: flex;
+  gap: 10px;
+}
+
+/* Стили для визуализации аудио */
+.waveform {
+  width: 100%;
+  height: 80px;
+  background-color: #222;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+/* Стили для эффектов */
+.effect-panel {
+  background-color: #252525;
+  border-radius: 6px;
+  padding: 15px;
+  margin-top: 15px;
+  border: 1px solid #3a3a3a;
+}
+
+.effect-title {
+  color: #4CAF50;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Стили для модальных окон */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #2a2a2a;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid #4CAF50;
+}
+
+/* Стили для кнопок закрытия */
+.close-button {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.close-button:hover {
+  color: #fff;
+}
+
+/* Дополнительные стили для App.jsx */
+
+.app-title {
+  color: #ff9800;
+  font-size: 24px;
+  margin-right: auto;
+  text-shadow: 1px 1px 2px #000;
+}
+
+.tab-buttons {
+  display: flex;
+  gap: 10px;
+  margin: 0 20px;
+}
+
+.tab-buttons button {
+  background: linear-gradient(to bottom, #4a4a4a, #3a3a3a);
+  border: 1px solid #555;
+  color: #ddd;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.tab-buttons button.active {
+  background: linear-gradient(to bottom, #5a5a5a, #4a4a4a);
+  border-color: #ff9800;
+  color: #fff;
+}
+
+.tab-buttons button:hover {
+  background: linear-gradient(to bottom, #5a5a5a, #4a4a4a);
+}
+
+.master-controls {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.master-volume {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.master-volume input {
+  width: 100px;
+}
+
+.app-footer {
+  background: #2a2a2a;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #444;
+}
+
+.bpm-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bpm-control input {
+  width: 60px;
+  padding: 5px;
+  background: #333;
+  border: 1px solid #444;
+  color: #eee;
+  border-radius: 4px;
+}
+
+.status-bar {
+  display: flex;
+  gap: 15px;
+  color: #aaa;
+  font-size: 14px;
+}
+
+.cpu-usage {
+  color: #4CAF50;
+}
+
+/* App.css additions */
+.audio-start-notice {
+  background: #ff9800;
+  color: #000;
+  padding: 5px 10px;
+  border-radius: 4px;
+  margin: 0 10px;
+  font-size: 14px;
+}
+
+.vst-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #333;
+  color: #fff;
+}
+
+.vst-header {
+  background: #222;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.app-title {
+  margin: 0;
+  color: #ff9800;
+}
+
+.tab-buttons {
+  display: flex;
+  gap: 5px;
+}
+
+.tab-buttons button {
+  background: #444;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.tab-buttons button.active {
+  background: #4CAF50;
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px;
+}
+
+.master-controls {
+  margin-left: auto;
+}
+
+.master-volume {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}

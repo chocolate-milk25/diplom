@@ -1,0 +1,74 @@
+/* MasterChannel.module.css */
+.masterChannel {
+  background: #2a2a2a;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 20px;
+  border: 1px solid #444;
+}
+
+.masterVolume {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.masterVolume label {
+  font-size: 14px;
+  color: #aaa;
+}
+
+.masterVolume input {
+  flex: 1;
+}
+
+.masterVolume span {
+  min-width: 40px;
+  text-align: right;
+}
+
+.masterEffects {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.masterEffect {
+  background: #333;
+  border-radius: 6px;
+  padding: 10px;
+  border: 1px solid #444;
+}
+
+.effectHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.effectHeader h4 {
+  margin: 0;
+  color: #e0e0e0;
+}
+
+.effectToggle {
+  background: #444;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.active .effectToggle {
+  background: #4CAF50;
+  color: white;
+}
+
+.effectControls {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #444;
+}
