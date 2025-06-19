@@ -13,6 +13,7 @@ export default function Mixer({ masterVolume }) {
   const [loop, setLoop] = useState(false);
   const masterRef = useRef(null);
   const playersRef = useRef([]);
+  const [showMasterEffects, setShowMasterEffects] = useState(false); // Новое состояние
 
   useEffect(() => {
     const masterChannel = new Tone.Channel({
@@ -154,43 +155,98 @@ export default function Mixer({ masterVolume }) {
     });
   };
 
+
+  console.log('Tracks to export:', tracks);
+tracks.forEach((track, i) => {
+  console.log(`Track ${i}:`, {
+    name: track.name,
+    buffer: track.buffer ? 'loaded' : 'missing',
+    duration: track.buffer ? track.buffer.duration : 0
+  });
+});
+
   const exportToWav = async () => {
-    try {
-      const offlineCtx = new OfflineAudioContext(
-        2,
-        Tone.context.sampleRate * 10,
-        Tone.context.sampleRate
-      );
-      
-      const masterChannel = new Tone.Channel().connect(offlineCtx.destination);
-      
-      const players = tracks.map(track => {
-        const player = new Tone.Player(track.buffer).connect(masterChannel);
-        return player;
-      });
-      
-      players.forEach(player => player.start());
-      
-      const renderedBuffer = await offlineCtx.startRendering();
-      const wavBlob = bufferToWav(renderedBuffer);
-      const url = URL.createObjectURL(wavBlob);
-      
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = 'mixdown.wav';
-      document.body.appendChild(a);
-      a.click();
-      
-      setTimeout(() => {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }, 100);
-    } catch (error) {
-      console.error('Export error:', error);
-      alert('Failed to export mix: ' + error.message);
+  try {
+    // Проверяем, есть ли треки для экспорта
+    if (tracks.length === 0) {
+      throw new Error('No tracks to export');
     }
-  };
+
+    // Рассчитываем длительность самого длинного трека
+    const maxDuration = Math.max(...tracks.map(t => t.buffer ? t.buffer.duration : 0));
+    if (maxDuration <= 0) {
+      throw new Error('Invalid track duration');
+    }
+
+    // Получаем sampleRate из текущего Tone.context
+    const sampleRate = Tone.context.sampleRate;
+
+    // Создаем OfflineAudioContext с правильным использованием sampleRate
+    const offlineCtx = new OfflineAudioContext(
+      2, // stereo
+      maxDuration * sampleRate,
+      sampleRate
+    );
+
+    // Создаем мастер-канал
+    const masterGain = offlineCtx.createGain();
+    masterGain.gain.value = 1;
+    masterGain.connect(offlineCtx.destination);
+
+    // Создаем и подключаем все треки
+    const sources = [];
+    for (const track of tracks) {
+      if (!track.buffer) continue;
+
+      const source = offlineCtx.createBufferSource();
+      source.buffer = track.buffer.get();
+
+      // Создаем цепочку обработки для трека
+      const gainNode = offlineCtx.createGain();
+      gainNode.gain.value = track.volume || 1;
+
+      const pannerNode = offlineCtx.createStereoPanner();
+      pannerNode.pan.value = track.pan || 0;
+
+      // Подключаем цепочку: source -> gain -> panner -> master
+      source.connect(gainNode);
+      gainNode.connect(pannerNode);
+      pannerNode.connect(masterGain);
+
+      source.start(0);
+      sources.push(source);
+    }
+
+    if (sources.length === 0) {
+      throw new Error('No valid audio sources to export');
+    }
+
+    // Рендерим аудио
+    const renderedBuffer = await offlineCtx.startRendering();
+
+    // Конвертируем в WAV
+    const wavBlob = bufferToWav(renderedBuffer);
+    const url = URL.createObjectURL(wavBlob);
+
+    // Создаем ссылку для скачивания
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = 'mixdown.wav';
+    document.body.appendChild(a);
+    a.click();
+
+    // Очищаем
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
+
+  } catch (error) {
+    console.error('Export error:', error);
+    alert(`Failed to export mix: ${error.message}`);
+  }
+};
 
   function bufferToWav(buffer) {
     const numOfChan = buffer.numberOfChannels;
@@ -270,6 +326,14 @@ export default function Mixer({ masterVolume }) {
           onStop={stopPlayback}
           onToggleLoop={toggleLoop}
         />
+        
+        {/* Кнопка переключения видимости мастер-эффектов */}
+        <button 
+          className={styles.toolbarButton}
+          onClick={() => setShowMasterEffects(!showMasterEffects)}
+        >
+          {showMasterEffects ? 'Скрыть мастер' : 'Показать мастер'}
+        </button>
       </div>
 
       <div className={styles.tracksContainer}>
@@ -292,10 +356,13 @@ export default function Mixer({ masterVolume }) {
         )}
       </div>
 
-      <MasterChannel 
-        masterRef={masterRef} 
-        onMasterUpdate={handleMasterEffectsUpdate}
-      />
+      {/* Условный рендеринг мастер-канала */}
+      {showMasterEffects && (
+        <MasterChannel 
+          masterRef={masterRef} 
+          onMasterUpdate={handleMasterEffectsUpdate}
+        />
+      )}
     </div>
   );
 }
