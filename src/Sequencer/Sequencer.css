@@ -110,17 +110,36 @@
 
 .step-cell {
   position: relative;
-  height: 100%;
+  width: 30px;
+  height: 30px;
   background: #222;
   border: 1px solid #444;
   cursor: pointer;
   box-sizing: border-box;
   flex-shrink: 0;
-  width: 30px;
 }
 
 .step-cell.active {
   background: #4CAF50;
+  /* Убираем все свойства, которые могут влиять на размер */
+}
+
+.note-duration-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 6px;
+  height: 100%;
+  cursor: ew-resize;
+  background-color: rgba(0, 0, 0, 0.2);
+  z-index: 2;
+  /* Никаких трансформаций или отступов */
+}
+
+.note-duration-handle:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+  width: 8px;
+  right: -2px; /* Компенсация увеличения ширины */
 }
 
 .step-cell.current {
@@ -134,22 +153,6 @@
 
 .step-cell.hidden {
   display: none;
-}
-
-.note-duration-handle {
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 8px;
-  height: 100%;
-  cursor: ew-resize;
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 2px 0 0 2px;
-  z-index: 2;
-}
-
-.note-duration-handle:hover {
-  background-color: rgba(255, 255, 255, 0.5);
 }
 
 /* Scrollbar styling */

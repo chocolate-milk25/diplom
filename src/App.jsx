@@ -53,7 +53,7 @@ export default function App() {
         <div className="tab-buttons">
           <button className={activeTab === 'mixer' ? 'active' : ''} onClick={() => handleTabClick('mixer')}>🎚️ Микшер</button>
           <button className={activeTab === 'sequencer' ? 'active' : ''} onClick={() => handleTabClick('sequencer')}>🎹 Секвенсор</button>
-          <button className={activeTab === 'synth' ? 'active' : ''} onClick={() => handleTabClick('synth')}>🎛️ Синтезатор</button>
+          
           <button className={activeTab === 'drums' ? 'active' : ''} onClick={() => handleTabClick('drums')}>🥁 Драм-машина</button>
         </div>
 
